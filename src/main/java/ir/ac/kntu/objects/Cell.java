@@ -1,5 +1,7 @@
 package ir.ac.kntu.objects;
 
+import ir.ac.kntu.game.GameSettings;
+
 public class Cell {
 
     private int posX;
@@ -11,6 +13,14 @@ public class Cell {
     public Cell(int posX,int posY){
         this.posX = posX;
         this.posY = posY;
+    }
+
+    public boolean isEmpty(){
+        if (cellObject == null){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void setCellObject(CellObject cellObject) {

@@ -3,6 +3,7 @@ package ir.ac.kntu.objects.capsule;
 import ir.ac.kntu.logic.Color;
 import ir.ac.kntu.objects.Cell;
 import ir.ac.kntu.objects.CellObject;
+import ir.ac.kntu.objects.Table;
 
 import java.util.Objects;
 
@@ -19,6 +20,8 @@ public abstract class Capsule implements CellObject {
     private int id;
 
     private static int ID = 0;
+
+    private boolean staticCapsule = false;
 
     Color headColor;
 
@@ -40,6 +43,7 @@ public abstract class Capsule implements CellObject {
 
     public void setHead(Cell head) {
         this.head = head;
+        this.syncWithCell(head);
     }
 
     public void setTail(Cell tail) {
@@ -80,6 +84,28 @@ public abstract class Capsule implements CellObject {
 
     public void setCapsuleStanding(CapsuleStanding capsuleStanding) {
         this.capsuleStanding = capsuleStanding;
+        syncWithCell(head);
+    }
+
+    public Cell getImageTail(Cell imageHead){
+        Cell result = null;
+        switch (getCapsuleStanding()){
+            case VERTICAL : {
+                result = Table.getInstance().getCell(imageHead.getPosX(),imageHead.getPosY()+1);
+            }
+            case HORIZONTAL : {
+                result = Table.getInstance().getCell(imageHead.getPosX()+1,imageHead.getPosY());
+            }
+        }
+        return result;
+    }
+
+    public void setStaticCapsule(boolean staticCapsule) {
+        this.staticCapsule = staticCapsule;
+    }
+
+    public boolean isStaticCapsule() {
+        return staticCapsule;
     }
 
     @Override

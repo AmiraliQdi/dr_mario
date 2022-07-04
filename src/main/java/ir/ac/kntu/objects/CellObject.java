@@ -5,7 +5,7 @@ import ir.ac.kntu.objects.capsule.MoveType;
 
 public interface CellObject {
 
-    public void syncWithCell(Cell cell) throws OutOfBoard;
+    public void syncWithCell(Cell cell);
 
     public void move(MoveType moveType);
 }

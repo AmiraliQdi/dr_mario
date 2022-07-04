@@ -16,7 +16,7 @@ public class Table {
         return instance;
     }
 
-    public void clearCells(){
+    public void clearAll(){
         for (int x = 0;x<GameSettings.getInstance().getTable_with();x++){
             for (int y = 0;y<GameSettings.getInstance().getTable_length();y++){
                 board[x][y].clearCell();
@@ -28,20 +28,7 @@ public class Table {
         return board[GameSettings.getInstance().getTable_with()/2 + 1][0];
     }
 
-    public Cell getCell(int x,int y) throws OutOfBoard {
-        if ((x < 0 || x > GameSettings.getInstance().getTable_with())) {
-            if ( x < 0){
-                throw new OutOfBoard(-1);
-            } else {
-                throw new OutOfBoard(1);
-            }
-        } else if ((y < 0 || y > GameSettings.getInstance().getTable_length())) {
-            if (y < 0){
-                throw new OutOfBoard(-2);
-            } else {
-                throw new OutOfBoard(2);
-            }
-        }
+    public Cell getCell(int x,int y) {
         return board[x][y];
     }
 
