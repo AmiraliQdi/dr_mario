@@ -1,8 +1,6 @@
 package ir.ac.kntu.logic;
 
 import ir.ac.kntu.exeptions.CellWasFull;
-import ir.ac.kntu.game.GameSettings;
-import ir.ac.kntu.objects.HalfCapsule;
 import ir.ac.kntu.objects.Table;
 import ir.ac.kntu.objects.Virus;
 import ir.ac.kntu.objects.capsule.Capsule;
@@ -18,8 +16,6 @@ public class GameSet implements Runnable{
 
     private Table table;
 
-    private int gameSpeed;
-
     private int virusCounts;
 
     private boolean gameOver = false;
@@ -30,9 +26,10 @@ public class GameSet implements Runnable{
 
     private int score;
 
-    public GameSet(Table table,int gameSpeed,int virusCounts) {
+    private int maxScoreOfUser;
+
+    public GameSet(Table table,int virusCounts) {
         this.table = table;
-        this.gameSpeed = gameSpeed;
         this.virusCounts = virusCounts;
         makeRandomViruses();
         stackCapsuleType = CapsuleType.NORMAL;
@@ -41,18 +38,20 @@ public class GameSet implements Runnable{
 
     private void makeRandomViruses(){
         int counter = virusCounts;
-        int virusRatio = (int) (GameSettings.getInstance().getTable_with()*
+        int virusRatio = (int) (Table.getInstance().getTableWith()*
                 GameSettings.getInstance().getRandomVirusRatio());
-        for (int i = GameSettings.getInstance().getTable_length();i>0;i--){
+        if (virusRatio<4){
+            virusRatio = 4;
+        }
+        for (int i = Table.getInstance().getTableLength()-1;i>0;i--){
             int cellsWithVirusCount = RandomHelper.getInstance().getBelow(virusRatio);
             if (cellsWithVirusCount > counter) {
                 cellsWithVirusCount = counter;
             }
             counter-=cellsWithVirusCount;
-            ArrayList<Integer> cellsWithVirus = RandomHelper.getInstance().makeRandomNumbersBelow(virusRatio,cellsWithVirusCount);
+            ArrayList<Integer> cellsWithVirus = RandomHelper.getInstance().makeRandomNumbersBelow(8,cellsWithVirusCount);
             for (Integer withVirus : cellsWithVirus) {
                 Virus newVirus = new Virus();
-                //TODO make sure for stacked same color spawn
                 newVirus.syncWithCell(Table.getInstance().getCell(withVirus, i));
             }
         }
@@ -83,21 +82,18 @@ public class GameSet implements Runnable{
                 CapsuleMove.moveDown(movingCapsule);
             } catch (CellWasFull e) {
                 e.getMessage();
-                checkForStackColor();
+                movingCapsule.activeStaticMode();
+                System.out.println("new Static");
                 if (movingCapsule.isStaticCapsule()){
                     break;
                 }
             }
             try {
-                Thread.sleep(gameSpeed* 1000L);
+                Thread.sleep(GameSettings.getInstance().getGameSpeed()* 1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void checkForStackColor(){
-        //TODO complete checkForStackColor() methode
     }
 
     private Capsule spawnCapsule(int i) {
@@ -116,16 +112,22 @@ public class GameSet implements Runnable{
     }
 
     private void gameOver(){
+        //TODO game over
+        if (score > Game.getInstance().getLoggedUser().getMaxScore()) {
+            Game.getInstance().getLoggedUser().setMaxScore(score);
+        }
         gameOver = true;
     }
 
     private boolean isStartingCellEmpty(){
-        if (GameSettings.getInstance().getStartingCell().isEmpty() &&
-                Table.getInstance().getCell(GameSettings.getInstance().getStartingCell().getPosX()+1,
-                        GameSettings.getInstance().getStartingCell().getPosY()).isEmpty()) {
+        if (Table.getInstance().getStartingCell1().isEmpty() && Table.getInstance().getStartingCell2().isEmpty()) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public int getScore() {
+        return score;
     }
 }

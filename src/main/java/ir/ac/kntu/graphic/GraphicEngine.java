@@ -1,13 +1,61 @@
 package ir.ac.kntu.graphic;
 
+import com.sun.javafx.iio.gif.GIFDescriptor;
+import ir.ac.kntu.logic.Game;
+import ir.ac.kntu.logic.GameSettings;
+import ir.ac.kntu.resources.User;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
+import java.io.IOException;
+
 
 public class GraphicEngine extends Application implements Runnable {
 
+    private static final int STARTING_MENU_WITH = 640;
+    private static final int STARTING_MENU_HEIGHT = 598;
+    private static final int MAIN_MENU_WITH = 400;
+    private static final int MAIN_MENU_HEIGHT = 110;
+    private static final int GAME_SETTING_MENU_WITH = 529;
+    private static final int GAME_SETTING_MENU_HEIGHT = 442;
+
+
     private int fps;
+
+    private Stage stage;
+
+    private Scene startingMenu;
+
+    private Scene mainMenu;
+
+    private Scene gameSettingScene;
+
+    private Scene gameScene;
 
     public GraphicEngine(){
     }
@@ -23,14 +71,280 @@ public class GraphicEngine extends Application implements Runnable {
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setTitle("Dr.Mario");
-        startMenu(stage);
+        this.stage = stage;
+        setMainStage();
+
+        startingMenu = startMenu();
+        mainMenu = mainMenu();
+        gameSettingScene = makeGameSettingScene();
+
+        stage.setScene(startingMenu);
+
+        stage.show();
     }
 
-    private void startMenu(Stage stage){
+    private void setMainStage(){
+        stage.setTitle("Dr.Mario");
+        Image logo = new Image("images/logo.jpg");
+        stage.getIcons().add(logo);
+        stage.setResizable(false);
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                System.out.println("Game closed");
+                Game.getInstance().closeThreads();
+            }
+        });
+    }
+
+    private Scene startMenu(){
         Group root = new Group();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        Scene scene = new Scene(root,STARTING_MENU_WITH,STARTING_MENU_HEIGHT);
+        Image backGround = new Image("images/StartingMenu.png");
+        ImageView backGroundView = new ImageView(backGround);
+        Circle circle = new Circle(185,430,6);
+        circle.setStroke(Color.RED);
+        circle.setFill(Color.RED);
+        circle.setOpacity(0);
+        backGroundView.setX(0);
+        backGroundView.setY(0);
+        root.getChildren().add(backGroundView);
+        root.getChildren().add(makeOnePlayer(circle));
+        root.getChildren().add(circle);
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                System.out.println(keyEvent.getCode().getChar());
+            }
+        });
+        return scene;
+    }
+
+    private Rectangle makeOnePlayer(Circle circle){
+        Rectangle onePlayer = new Rectangle(180,419,300,20);
+        onePlayer.setOpacity(0.1);
+        onePlayer.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                circle.setOpacity(0.8);
+            }
+        });
+        onePlayer.setOnMouseExited(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                circle.setOpacity(0);
+            }
+        });
+        onePlayer.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                stage.setScene(mainMenu);
+                Game.getInstance().makePlayerOne();
+            }
+        });
+        return onePlayer;
+    }
+
+    private Scene mainMenu(){
+        Group group = new Group();
+        Image backGround = new Image("images/MainMenu.png");
+        ImageView backGroundView = new ImageView(backGround);
+        backGroundView.setOpacity(0.8);
+        group.getChildren().add(backGroundView);
+        GridPane root = new GridPane();
+        root.setPadding(new Insets(20));
+        root.setVgap(10);
+        root.setHgap(25);
+        Label enterUser = new Label("Enter your name :");
+        enterUser.setFont(Font.font("COOP",FontWeight.BOLD,13));
+        enterUser.setTextFill(Color.WHITE);
+        GridPane.setConstraints(enterUser,0,0);
+        TextField inputForName = new TextField();
+        Label dataFromUser = new Label("-");
+        dataFromUser.setFont(Font.font("COOP",FontWeight.BOLD,13));
+        dataFromUser.setTextFill(Color.WHITE);
+        GridPane.setConstraints(inputForName,1,0);
+        Button enterButton = makeMainUserButton(inputForName,dataFromUser);
+        enterButton.setFont(Font.font("COOP",FontWeight.BOLD,13));
+        GridPane.setConstraints(enterButton,2,0);
+
+        Label foundedUser = new Label("User : ");
+        foundedUser.setFont(Font.font("COOP",FontWeight.BOLD,13));
+        foundedUser.setTextFill(Color.WHITE);
+        GridPane.setConstraints(foundedUser,0,1);
+
+        GridPane.setConstraints(dataFromUser,1,1);
+        Button continueButton = makeContinueButton(dataFromUser);
+        continueButton.setFont(Font.font("COOP",FontWeight.BOLD,13));
+        GridPane.setConstraints(continueButton,2,1);
+
+        root.getChildren().addAll(enterUser,inputForName,enterButton,foundedUser,dataFromUser,continueButton);
+        group.getChildren().add(root);
+        Scene scene = new Scene(group,MAIN_MENU_WITH,MAIN_MENU_HEIGHT,Color.GREEN);
+        return scene;
+    }
+
+    private Button makeMainUserButton(TextField input,Label dataFromUser){
+        Button enterButton = new Button("Enter");
+        GridPane.setHalignment(enterButton,HPos.RIGHT);
+        enterButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                String userName = input.getText();
+                try {
+                    User foundedUser = User.loadUser(userName);
+                    Game.getInstance().setLoggedUser(foundedUser);
+                    System.out.println("Logged as user : " + foundedUser.getName());
+                    dataFromUser.setText(foundedUser.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return enterButton;
+    }
+
+    private Button makeContinueButton(Label label){
+        Button continueButton = new Button("Continue");
+        continueButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (!label.getText().equals("-")){
+                    stage.setScene(gameSettingScene);
+                }
+            }
+        });
+        return continueButton;
+    }
+
+    private Scene makeGameSettingScene(){
+        Group root = new Group();
+        Image backGround = new Image("images/GameSetting.png");
+        ImageView backGroundView = new ImageView(backGround);
+        Rectangle fast = new Rectangle(120,120,60,40);
+        fast.setFill(Color.RED);
+        fast.setOpacity(0.5);
+        fast.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (fast.getOpacity() == 0.5){
+                    fast.setOpacity(1);
+                    GameSettings.getInstance().setGameSpeed(1);
+                } else {
+                    fast.setOpacity(0.5);
+                    GameSettings.getInstance().setGameSpeed(0);
+                }
+            }
+        });
+        Rectangle medium = new Rectangle(236,120,60,40);
+        medium.setFill(Color.ORANGE);
+        medium.setOpacity(0.5);
+        medium.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (medium.getOpacity() == 0.5){
+                    medium.setOpacity(1);
+                    GameSettings.getInstance().setGameSpeed(2);
+                } else {
+                    medium.setOpacity(0.5);
+                    GameSettings.getInstance().setGameSpeed(0);
+                }
+            }
+        });
+        Rectangle slow = new Rectangle(355,120,56,40);
+        slow.setFill(Color.BLUE);
+        slow.setOpacity(0.5);
+        slow.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (slow.getOpacity() == 0.5){
+                    slow.setOpacity(1);
+                    GameSettings.getInstance().setGameSpeed(1);
+                } else {
+                    slow.setOpacity(0.5);
+                    GameSettings.getInstance().setGameSpeed(3);
+                }
+            }
+        });
+        root.getChildren().add(backGroundView);
+        root.getChildren().add(makeGameSettingGridPaint());
+        root.getChildren().addAll(slow,medium,fast);
+        return new Scene(root,GAME_SETTING_MENU_WITH,GAME_SETTING_MENU_HEIGHT);
+    }
+
+    private Parent makeGameSettingGridPaint(){
+        GridPane root = new GridPane();
+        root.setPadding(new Insets(50,30,20,30));
+        root.setVgap(20);
+        root.setHgap(50);
+        Label diffLabel = new Label("Select difficulty level :");
+        diffLabel.setFont(Font.font("COOP",FontWeight.BOLD,15));
+        diffLabel.setTextFill(Color.WHITE);
+        GridPane.setConstraints(diffLabel,1,2);
+        Label levelLabel = new Label("Select level :");
+        levelLabel.setFont(Font.font("COOP",FontWeight.BOLD,15));
+        levelLabel.setTextFill(Color.WHITE);
+        GridPane.setConstraints(levelLabel,1,5);
+        TextField level = new TextField();
+        GridPane.setConstraints(level,1,6);
+        Button continueButton = makeContinueButton(level);
+        continueButton.setFont(Font.font("COOP",FontWeight.BOLD,15));
+        GridPane.setConstraints(continueButton,1,7);
+        root.getChildren().addAll(diffLabel,continueButton,levelLabel,level);
+        return root;
+    }
+
+    private Button makeContinueButton(TextField textField){
+        Button continueButton = new Button("Start");
+        continueButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                int level = Integer.parseInt(textField.getText());
+                if (level < 0) {
+                    level = 1;
+                } else if (level > 20) {
+                    level = 20;
+                }
+                GameSettings.getInstance().setGameLevel(level);
+                if (GameSettings.getInstance().getGameSpeed()==0){
+                    GameSettings.getInstance().setGameSpeed(2);
+                }
+                gameScene = makeGameScene();
+                stage.setScene(gameScene);
+            }
+        });
+        return continueButton;
+    }
+
+    private Scene makeGameScene(){
+        Game.getInstance().makeGameSet();
+        Group group = new Group();
+        group.getChildren().add(makeGameSceneBackGround());
+        group.getChildren().add(makeGameSceneTexts());
+        return new Scene(group,800,700);
+    }
+
+    private Parent makeGameSceneTexts(){
+        Group root = new Group();
+        Label score = new Label("Score : ");
+        score.setFont(Font.font("COB",FontWeight.BOLD,25));
+        score.relocate(63,120);
+        Label actScore = new Label(String.valueOf(Game.getInstance().getGameSet().getScore()));
+        actScore.setFont(Font.font("COB",FontWeight.BOLD,25));
+        actScore.relocate(63,140);
+        Label maxScore = new Label("Max score : ");
+        maxScore.setFont(Font.font("COB",FontWeight.BOLD,25));
+        maxScore.relocate(63,210);
+        Label actMaxScore = new Label(String.valueOf(Game.getInstance().getLoggedUser().getMaxScore()));
+        actMaxScore.setFont(Font.font("COB",FontWeight.BOLD,25));
+        actMaxScore.relocate(63,240);
+        root.getChildren().add(score);
+        root.getChildren().add(maxScore);
+        return root;
+    }
+
+    private ImageView makeGameSceneBackGround(){
+        Image backGround = new Image("images/MainScene2.png");
+        return new ImageView(backGround);
     }
 }

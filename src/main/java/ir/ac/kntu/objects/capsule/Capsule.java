@@ -28,7 +28,7 @@ public abstract class Capsule implements CellObject {
     Color tailColor;
 
     public Capsule(){
-        capsuleStanding = CapsuleStanding.VERTICAL;
+        capsuleStanding = CapsuleStanding.HORIZONTAL;
         id = ID;
         ID++;
     }
@@ -43,7 +43,6 @@ public abstract class Capsule implements CellObject {
 
     public void setHead(Cell head) {
         this.head = head;
-        this.syncWithCell(head);
     }
 
     public void setTail(Cell tail) {
@@ -107,6 +106,8 @@ public abstract class Capsule implements CellObject {
     public boolean isStaticCapsule() {
         return staticCapsule;
     }
+
+    public abstract void activeStaticMode();
 
     @Override
     public boolean equals(Object o) {

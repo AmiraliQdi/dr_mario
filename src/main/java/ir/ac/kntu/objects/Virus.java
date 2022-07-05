@@ -50,6 +50,7 @@ public class Virus implements CellObject{
     public void syncWithCell(Cell cell) {
         this.cell = cell;
         cell.setCellObject(this);
+        cell.setCellObjectType(CellObjectType.VIRUS);
     }
 
     @Override

@@ -1,19 +1,15 @@
 package ir.ac.kntu;
 
-import ir.ac.kntu.graphic.GraphicEngine;
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import ir.ac.kntu.logic.GameSettings;
+import ir.ac.kntu.logic.Game;
+import javafx.scene.image.Image;
 
 public class Main {
 
     public static void main(String[] args) {
-        GraphicEngine graphicEngine = new GraphicEngine();
-        graphicEngine.setFps(15);
-        Thread graphicEngineThread = new Thread(graphicEngine);
-        graphicEngineThread.start();
+
+        Game.getInstance().start();
+
     }
 
 }

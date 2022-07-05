@@ -40,6 +40,7 @@ public class HalfCapsule implements CellObject{
     public void syncWithCell(Cell cell) {
         this.cell = cell;
         cell.setCellObject(this);
+        cell.setCellObjectType(CellObjectType.HALF_CAPSULE);
     }
 
     @Override
