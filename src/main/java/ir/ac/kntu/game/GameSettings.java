@@ -3,14 +3,15 @@ package ir.ac.kntu.game;
 import ir.ac.kntu.exeptions.OutOfBoard;
 import ir.ac.kntu.objects.Cell;
 import ir.ac.kntu.objects.Table;
+import ir.ac.kntu.util.RandomHelper;
 
 public class GameSettings {
 
     private final Cell startingCell = Table.getInstance().getStartingCell();
 
-    private final int table_with = 15;
+    private final int table_with = 8;
 
-    private final int table_length = 40;
+    private final int table_length = 16;
 
     private static final GameSettings instance = new GameSettings();
 
@@ -32,5 +33,9 @@ public class GameSettings {
 
     public Cell getStartingCell() {
         return startingCell;
+    }
+
+    public double getRandomVirusRatio() {
+        return RandomHelper.getInstance().getChance();
     }
 }

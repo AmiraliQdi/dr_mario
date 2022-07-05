@@ -10,6 +10,7 @@ import ir.ac.kntu.objects.capsule.CapsuleType;
 import ir.ac.kntu.objects.capsule.EnhancementCapsule;
 import ir.ac.kntu.objects.capsule.NormalCapsule;
 import ir.ac.kntu.util.CapsuleMove;
+import ir.ac.kntu.util.RandomHelper;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,22 @@ public class GameSet implements Runnable{
     }
 
     private void makeRandomViruses(){
-        //TODO complete makeRandomViruses() methode
+        int counter = virusCounts;
+        int virusRatio = (int) (GameSettings.getInstance().getTable_with()*
+                GameSettings.getInstance().getRandomVirusRatio());
+        for (int i = GameSettings.getInstance().getTable_length();i>0;i--){
+            int cellsWithVirusCount = RandomHelper.getInstance().getBelow(virusRatio);
+            if (cellsWithVirusCount > counter) {
+                cellsWithVirusCount = counter;
+            }
+            counter-=cellsWithVirusCount;
+            ArrayList<Integer> cellsWithVirus = RandomHelper.getInstance().makeRandomNumbersBelow(virusRatio,cellsWithVirusCount);
+            for (Integer withVirus : cellsWithVirus) {
+                Virus newVirus = new Virus();
+                //TODO make sure for stacked same color spawn
+                newVirus.syncWithCell(Table.getInstance().getCell(withVirus, i));
+            }
+        }
     }
 
     @Override
@@ -68,6 +84,9 @@ public class GameSet implements Runnable{
             } catch (CellWasFull e) {
                 e.getMessage();
                 checkForStackColor();
+                if (movingCapsule.isStaticCapsule()){
+                    break;
+                }
             }
             try {
                 Thread.sleep(gameSpeed* 1000L);

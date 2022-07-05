@@ -1,25 +1,19 @@
 package ir.ac.kntu;
 
+import ir.ac.kntu.graphic.GraphicEngine;
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-
-/**
- * @author Sina Rostami
- */
-public class Main extends Application {
+public class Main {
 
     public static void main(String[] args) {
-        launch(args);
+        GraphicEngine graphicEngine = new GraphicEngine();
+        graphicEngine.setFps(15);
+        Thread graphicEngineThread = new Thread(graphicEngine);
+        graphicEngineThread.start();
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(new Pane());
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
 }
