@@ -363,10 +363,10 @@ public class GraphicEngine extends Application implements Runnable {
         Image backGround = new Image("images/GameOver.png");
         ImageView backGroundView = new ImageView(backGround);
         group.getChildren().add(backGroundView);
-        Label score = new Label("Score: ");
+        Label score = new Label("Score: " + Game.getInstance().getGameSet().getScore());
         score.setFont(Font.font("COB",FontWeight.BOLD,20));
         score.relocate(30,140);
-        Label maxScore = new Label("Max score: ");
+        Label maxScore = new Label("Max score: "+ Game.getInstance().getLoggedUser().getMaxScore());
         maxScore.setFont(Font.font("COB",FontWeight.BOLD,20));
         maxScore.relocate(30,180);
         group.getChildren().addAll(score,maxScore);

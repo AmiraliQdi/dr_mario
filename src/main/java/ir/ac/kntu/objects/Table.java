@@ -92,6 +92,11 @@ public class Table implements Runnable{
     @Override
     public void run() {
         while (true) {
+            try {
+                Thread.sleep(GameSettings.getInstance().getGameSpeed()* 1000L);
+            } catch (InterruptedException e){
+
+            }
             checkForSameColors();
         }
     }
@@ -105,8 +110,8 @@ public class Table implements Runnable{
                     System.out.println("Same color in row");
                     sameColorStack(cellStack.getStack());
                 }
-                cellStack.clearStack();
             }
+            cellStack.clearStack();
         }
         for (int j = 0;j < tableLength;j++){
             CellStack cellStack = new CellStack();
@@ -116,13 +121,14 @@ public class Table implements Runnable{
                     System.out.println("Same color in collemn");
                     sameColorStack(cellStack.getStack());
                 }
-                cellStack.clearStack();
             }
+            cellStack.clearStack();
         }
     }
 
 
     private void sameColorStack(ArrayList<Cell> cells){
+        Game.getInstance().getGameSet().getMovingCapsule().setStaticCapsule(true);
         //TODO animation clearing cell
         int virusCount = 0;
         int score = 0;

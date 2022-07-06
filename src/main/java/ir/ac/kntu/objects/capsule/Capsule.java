@@ -35,6 +35,16 @@ public abstract class Capsule implements CellObject {
         ID++;
     }
 
+    public void rotate(){
+        if (degree == 360) {
+            degree = 0;
+        } else if (degree == 0){
+            degree = 180;
+        } else {
+            degree+=90;
+        }
+    }
+
     public void setCapsuleType(CapsuleType capsuleType) {
         this.capsuleType = capsuleType;
     }

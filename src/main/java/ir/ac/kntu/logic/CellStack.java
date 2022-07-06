@@ -35,6 +35,7 @@ public class CellStack {
 
     public boolean isSameColorStack(){
         ArrayList<Color> colors = new ArrayList<>();
+        System.out.println("size :" + cells.size());
         if (cells.size()!=4){
             return false;
         }
@@ -42,8 +43,11 @@ public class CellStack {
             if (cells.get(i).getColor() == null){
                 return false;
             }
-            colors.add(cells.get(i).getColor());
         }
+        for (int j = 0;j<4;j++){
+            colors.add(cells.get(j).getColor());
+        }
+        System.out.println(colors);
         if (colors.get(0) == Color.RED && colors.get(1) == Color.RED
                 && colors.get(2) == Color.RED && colors.get(3) == Color.RED){
             return true;
