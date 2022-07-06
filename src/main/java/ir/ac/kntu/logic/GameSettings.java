@@ -46,4 +46,8 @@ public class GameSettings {
         return gameLevel;
     }
 
+    public void levelUp(){
+        gameLevel++;
+    }
+
 }

@@ -22,11 +22,13 @@ public class GameSet implements Runnable{
 
     private Capsule stackCapsule;
 
+    private Capsule movingCapsule;
+
     private CapsuleType stackCapsuleType;
 
     private int score;
 
-    private int maxScoreOfUser;
+    private boolean nextLevelAccessible = false;
 
     public GameSet(Table table,int virusCounts) {
         this.table = table;
@@ -36,23 +38,59 @@ public class GameSet implements Runnable{
         this.score = 0;
     }
 
-    private void makeRandomViruses(){
-        int counter = virusCounts;
-        int virusRatio = (int) (Table.getInstance().getTableWith()*
-                GameSettings.getInstance().getRandomVirusRatio());
-        if (virusRatio<4){
-            virusRatio = 4;
+    public void addScore(int added){
+        score+=added;
+    }
+
+    public Capsule getMovingCapsule() {
+        return movingCapsule;
+    }
+
+    public void setNextLevelAccessible(boolean nextLevelAccessible) {
+        this.nextLevelAccessible = nextLevelAccessible;
+    }
+
+    public boolean isNextLevelAccessible() {
+        return nextLevelAccessible;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public int getVirusCounts() {
+        return virusCounts;
+    }
+
+    public void setVirusCounts(int virusCounts) {
+        this.virusCounts = virusCounts;
+    }
+
+    public void removeViruses(int count) {
+        virusCounts -= count;
+        if (virusCounts<0) {
+            virusCounts = 0;
         }
-        for (int i = Table.getInstance().getTableLength()-1;i>0;i--){
-            int cellsWithVirusCount = RandomHelper.getInstance().getBelow(virusRatio);
+    }
+
+    private void makeRandomViruses() {
+        int counter = virusCounts;
+        int virusRatio = (int) (Table.getInstance().getTableWith() *
+                GameSettings.getInstance().getRandomVirusRatio());
+        if (virusRatio < 6) {
+            virusRatio = 6;
+        }
+        for (int i = Table.getInstance().getTableLength() - 1; i > 0; i--) {
+            double ratio = (15 + (double) i) / 15;
+            int cellsWithVirusCount = RandomHelper.getInstance().getBelow((int) ((virusRatio) * ratio));
             if (cellsWithVirusCount > counter) {
                 cellsWithVirusCount = counter;
             }
-            counter-=cellsWithVirusCount;
-            ArrayList<Integer> cellsWithVirus = RandomHelper.getInstance().makeRandomNumbersBelow(8,cellsWithVirusCount);
+            counter -= cellsWithVirusCount;
+            ArrayList<Integer> cellsWithVirus = RandomHelper.getInstance().makeRandomNumbersBelow(8, cellsWithVirusCount);
             for (Integer withVirus : cellsWithVirus) {
                 Virus newVirus = new Virus();
-                newVirus.syncWithCell(Table.getInstance().getCell(withVirus, i));
+                newVirus.syncWithCell(Table.getInstance().getCell(withVirus, i),null);
             }
         }
     }
@@ -61,7 +99,6 @@ public class GameSet implements Runnable{
     public void run() {
         boolean isStarted = false;
         while (!gameOver) {
-            Capsule movingCapsule;
             if (!isStartingCellEmpty()) {
                 gameOver();
             }
@@ -72,18 +109,16 @@ public class GameSet implements Runnable{
                 movingCapsule = spawnCapsule(1);
             }
             makeStackCapsule();
-            moving(movingCapsule);
+            moving();
         }
     }
 
-    private void moving(Capsule movingCapsule){
+    private void moving(){
         while (!movingCapsule.isStaticCapsule()) {
             try {
                 CapsuleMove.moveDown(movingCapsule);
             } catch (CellWasFull e) {
-                e.getMessage();
                 movingCapsule.activeStaticMode();
-                System.out.println("new Static");
                 if (movingCapsule.isStaticCapsule()){
                     break;
                 }

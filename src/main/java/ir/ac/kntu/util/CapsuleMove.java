@@ -2,125 +2,191 @@ package ir.ac.kntu.util;
 
 import ir.ac.kntu.exeptions.CellWasFull;
 import ir.ac.kntu.objects.Cell;
+import ir.ac.kntu.objects.CellObjectType;
 import ir.ac.kntu.objects.Table;
 import ir.ac.kntu.objects.capsule.Capsule;
 import ir.ac.kntu.objects.capsule.CapsuleStanding;
 
 public class CapsuleMove {
 
-    public static void moveLeft(Capsule capsule) throws CellWasFull {
-        Cell head = capsule.getHead();
-        Cell tail = capsule.getTail();
-        switch (capsule.getCapsuleStanding()) {
-            case VERTICAL : {
-                if (head.getPosX()-1 >= 0) {
-                    if (Table.getInstance().getCell(head.getPosX()-1,head.getPosY()).isEmpty() &&
-                            Table.getInstance().getCell(head.getPosX()-1,head.getPosY()+1).isEmpty()){
-                        capsule.syncWithCell(Table.getInstance().getCell(head.getPosX()-1,head.getPosY()));
-                        head.clearCell();
-                        tail.clearCell();
-                    } else {
-                        throw new CellWasFull(2);
-                    }
+    public synchronized static void moveLeft(Capsule capsule) throws CellWasFull {
+        Cell oldHead = capsule.getHead();
+        Cell oldTail = capsule.getTail();
+        Cell newHead = null;
+        Cell newTail = null;
+        switch (capsule.getDegree()) {
+            case 0, 270 -> {
+                if (oldHead.getPosX()-1<0) {
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX()-1,oldHead.getPosY()).isEmpty() &&
+                    Table.getInstance().getCell(oldTail.getPosX()-1,oldTail.getPosY()).isEmpty()) {
+                    newHead = Table.getInstance().getCell(oldHead.getPosX()-1,oldHead.getPosY());
+                    newTail = Table.getInstance().getCell(oldTail.getPosX()-1,oldTail.getPosY());
+                    oldHead.clearCell();
+                    oldTail.clearCell();
                 }
             }
-            case HORIZONTAL: {
-                if (head.getPosX()-1 >= 0) {
-                    if (Table.getInstance().getCell(head.getPosX()-1,head.getPosY()).isEmpty()) {
-                        capsule.syncWithCell(Table.getInstance().getCell(head.getPosX()-1,head.getPosY()));
-                        tail.clearCell();
-                    } else {
-                        throw new CellWasFull(2);
-                    }
+            case 180 -> {
+                if (oldHead.getPosX()-1<0){
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX()-1,oldHead.getPosY()).isEmpty()){
+                    newHead = Table.getInstance().getCell(oldHead.getPosX()-1,oldHead.getPosY());
+                    newTail = oldHead;
+                    oldTail.clearCell();
                 }
             }
-        }
-    }
-
-    public static void moveRight(Capsule capsule) throws CellWasFull {
-        Cell head = capsule.getHead();
-        Cell tail = capsule.getTail();
-        switch (capsule.getCapsuleStanding()) {
-            case HORIZONTAL : {
-                if (head.getPosX() + 2 <= Table.getInstance().getTableWith()) {
-                    if (Table.getInstance().getCell(head.getPosX() + 2,head.getPosY()).isEmpty()) {
-                        capsule.syncWithCell(capsule.getTail());
-                        head.clearCell();
-                    } else {
-                        throw new CellWasFull(3);
-                    }
+            case 360 -> {
+                if (oldTail.getPosX()-1<0){
+                    return;
                 }
-            }
-            case VERTICAL: {
-                if (head.getPosX() + 1 <= Table.getInstance().getTableWith()) {
-                    if (Table.getInstance().getCell(head.getPosX()+1, head.getPosY()).isEmpty()
-                            && Table.getInstance().getCell(head.getPosX() + 1, head.getPosY() + 1).isEmpty()) {
-                        capsule.syncWithCell(Table.getInstance().getCell(head.getPosX()+1,head.getPosY()));
-                        head.clearCell();
-                        tail.clearCell();
-                    } else {
-                        throw new CellWasFull(3);
-                    }
+                if (Table.getInstance().getCell(oldTail.getPosX()-1,oldTail.getPosY()).isEmpty()){
+                    newHead = oldTail;
+                    newTail = Table.getInstance().getCell(oldTail.getPosX()-1,oldTail.getPosY());
+                    oldHead.clearCell();
                 }
             }
         }
-
+        capsule.syncWithCell(newHead,newTail);
     }
 
-    public static void moveDown(Capsule capsule) throws CellWasFull {
-        Cell head = capsule.getHead();
-        Cell tail = capsule.getTail();
-        switch (capsule.getCapsuleStanding()) {
-            case VERTICAL : {
-                if (head.getPosY() + 2 <= Table.getInstance().getTableLength()) {
-                    if (Table.getInstance().getCell(head.getPosX(),head.getPosY()+2).isEmpty()) {
-                        capsule.syncWithCell(capsule.getTail());
-                        head.clearCell();
-                    } else {
-                        capsule.setStaticCapsule(true);
-                        throw new CellWasFull(4);
-                    }
+    public synchronized static void moveRight(Capsule capsule) throws CellWasFull {
+        Cell oldHead = capsule.getHead();
+        Cell oldTail = capsule.getTail();
+        Cell newHead = null;
+        Cell newTail = null;
+        switch (capsule.getDegree()) {
+            case 0, 270 -> {
+                if (oldHead.getPosX()+1>=8){
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX()+1,oldHead.getPosY()).isEmpty() &&
+                        Table.getInstance().getCell(oldTail.getPosX()+1,oldTail.getPosY()).isEmpty()){
+                    newHead = Table.getInstance().getCell(oldHead.getPosX()+1,oldHead.getPosY());
+                    newTail = Table.getInstance().getCell(oldTail.getPosX()+1,oldTail.getPosY());
+                    oldHead.clearCell();
+                    oldTail.clearCell();
                 }
             }
-            case HORIZONTAL: {
-                if (head.getPosY() + 1 <= Table.getInstance().getTableLength()) {
-                    if (Table.getInstance().getCell(head.getPosX(),head.getPosY() + 1).isEmpty() &&
-                            Table.getInstance().getCell(head.getPosX() + 1, head.getPosY() + 1).isEmpty()) {
-                        capsule.syncWithCell(Table.getInstance().getCell(head.getPosX(),head.getPosY()+1));
-                        head.clearCell();
-                        tail.clearCell();
-                    } else {
-                        capsule.setStaticCapsule(true);
-                        throw new CellWasFull(4);
-                    }
+            case 180 -> {
+                if(oldTail.getPosX()+1>=8){
+                    return;
+                }
+                if (Table.getInstance().getCell(oldTail.getPosX()+1,oldTail.getPosY()).isEmpty()){
+                    newHead = oldTail;
+                    newTail = Table.getInstance().getCell(oldTail.getPosX()+1,oldTail.getPosY());
+                    oldHead.clearCell();
+                }
+            }
+            case 360 -> {
+                if (oldHead.getPosX()+1<=8){
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX()+1,oldHead.getPosY()).isEmpty()){
+                    newHead = Table.getInstance().getCell(oldHead.getPosX()+1,oldHead.getPosY());
+                    newTail = oldHead;
+                    oldTail.clearCell();
                 }
             }
         }
+        capsule.syncWithCell(newHead,newTail);
     }
 
-    public static void rotate(Capsule capsule) throws CellWasFull {
-        Cell head = capsule.getHead();
-        Cell tail = capsule.getTail();
-        switch (capsule.getCapsuleStanding()) {
-            case VERTICAL: {
-                if (!(capsule.getHead().getPosX() == Table.getInstance().getTableWith())){
-                    if (Table.getInstance().getCell(capsule.getHead().getPosX()+1,capsule.getHead().getPosY()).isEmpty()) {
-                        capsule.setCapsuleStanding(CapsuleStanding.HORIZONTAL);
-                        tail.clearCell();
-                    } else {
-                        throw new CellWasFull(1);
-                    }
-
+    public synchronized static void moveDown(Capsule capsule) throws CellWasFull {
+        Cell oldHead = capsule.getHead();
+        Cell oldTail = capsule.getTail();
+        Cell newHead = null;
+        Cell newTail = null;
+        switch (capsule.getDegree()) {
+            case 0 -> {
+                if (oldHead.getPosY()+1>=16) {
+                    capsule.setStaticCapsule(true);
+                    return;
                 }
-            }
-            case HORIZONTAL: {
-                if (Table.getInstance().getCell(capsule.getHead().getPosX(),capsule.getHead().getPosY()+1).isEmpty()){
-                    capsule.setCapsuleStanding(CapsuleStanding.VERTICAL);
-                    tail.clearCell();
+                if (Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()+1).isEmpty()){
+                    newHead = Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()+1);
+                    newTail = oldHead;
+                    oldTail.clearCell();
                 } else {
-                    throw new CellWasFull(1);
+                    capsule.setStaticCapsule(true);
+                }
+            }
+            case 180, 360 -> {
+                if (oldHead.getPosY()+1>=16){
+                    capsule.setStaticCapsule(true);
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()+1).isEmpty() &&
+                        Table.getInstance().getCell(oldTail.getPosX(),oldTail.getPosY()+1).isEmpty()){
+                    newHead = Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()+1);
+                    newTail = Table.getInstance().getCell(oldTail.getPosX(),oldTail.getPosY()+1);
+                    oldHead.clearCell();
+                    oldTail.clearCell();
+                } else {
+                    capsule.setStaticCapsule(true);
+                }
+            }
+            case 270 -> {
+                if (oldTail.getPosY()+1>=16){
+                    capsule.setStaticCapsule(true);
+                    return;
+                }
+                if (Table.getInstance().getCell(oldTail.getPosX(),oldTail.getPosY()+1).isEmpty()){
+                    newHead = oldTail;
+                    newTail = Table.getInstance().getCell(oldTail.getPosX(),oldTail.getPosY()+1);
+                    oldHead.clearCell();
+                } else {
+                    capsule.setStaticCapsule(true);
                 }
             }
         }
+        capsule.syncWithCell(newHead,newTail);
+    }
+
+    public synchronized static void rotate(Capsule capsule) throws CellWasFull {
+        Cell oldHead = capsule.getHead();
+        Cell oldTail = capsule.getTail();
+        Cell newHead = null;
+        Cell newTail = null;
+        switch (capsule.getDegree()) {
+            case 0 -> {
+                capsule.setCapsuleStanding(CapsuleStanding.HORIZONTAL);
+                if (oldHead.getPosX()+1>=8){
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX()+1,oldHead.getPosY()).isEmpty()){
+                    newTail = Table.getInstance().getCell(oldHead.getPosX()+1,oldHead.getPosY());
+                }
+            }
+            case 180 -> {
+                capsule.setCapsuleStanding(CapsuleStanding.VERTICAL);
+                if (oldHead.getPosY()+1>=16){
+                    capsule.setStaticCapsule(true);
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()+1).isEmpty()){
+                    newTail = Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()+1);
+                }
+            }
+            case 270 -> {
+                capsule.setCapsuleStanding(CapsuleStanding.HORIZONTAL);
+                if (oldHead.getPosX()-1<0){
+                    return;
+                }
+                if (Table.getInstance().getCell(oldHead.getPosX()-1,oldHead.getPosY()).isEmpty()){
+                    newTail = Table.getInstance().getCell(oldHead.getPosX()-1,oldHead.getPosY());
+                }
+            }
+            case 360 -> {
+                capsule.setCapsuleStanding(CapsuleStanding.VERTICAL);
+                if (Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()-1).isEmpty()){
+                    newTail = Table.getInstance().getCell(oldHead.getPosX(),oldHead.getPosY()-1);
+                }
+            }
+        }
+        oldTail.clearCell();
+        newHead = oldHead;
+        capsule.syncWithCell(newHead,newTail);
     }
 }

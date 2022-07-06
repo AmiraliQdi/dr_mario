@@ -1,7 +1,15 @@
 package ir.ac.kntu.objects;
 
+import ir.ac.kntu.logic.CellStack;
+import ir.ac.kntu.logic.Game;
 import ir.ac.kntu.logic.GameSettings;
 import ir.ac.kntu.objects.capsule.Capsule;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.Stack;
 
 public class Table implements Runnable{
 
@@ -12,6 +20,8 @@ public class Table implements Runnable{
     private final int tableWith = 8;
 
     private final int tableLength = 16;
+
+    private ImageView[][] imageViews;
 
     private Table(){
         board = new Cell[tableWith][tableLength];
@@ -58,28 +68,83 @@ public class Table implements Runnable{
         return tableWith;
     }
 
-    public void printTable(){
-        System.out.println();
-        for (int i = 0;i< Table.instance.tableLength;i++){
-            for (int j = 0;j<Table.getInstance().tableWith;j++){
-                Cell cell = Table.getInstance().getCell(j,i);
-                System.out.print(cell.print());
+    public void makeImageViews(){
+        imageViews = new ImageView[Table.getInstance().getTableWith()][Table.getInstance().getTableLength()];
+        for (int i = 0;i < tableWith;i++){
+            for (int j = 0;j< tableLength;j++){
+                imageViews[i][j] = new ImageView("images/table_images/null.png");
             }
-            System.out.println();
         }
+    }
+
+    public void setImageViews(Image[][] images){
+        for (int i = 0;i < tableWith;i++){
+            for (int j = 0;j< tableLength;j++){
+                imageViews[i][j].setImage(images[i][j]);
+            }
+        }
+    }
+
+    public ImageView[][] getImageViews() {
+        return imageViews;
     }
 
     @Override
     public void run() {
-        while (true){
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e){
-
-            }
-            System.out.println("========");
-            printTable();
+        while (true) {
+            checkForSameColors();
         }
-        //TODO Table Thread
+    }
+
+    private void checkForSameColors(){
+        for (int i = 0;i < tableWith;i++){
+            CellStack cellStack = new CellStack();
+            for (int j = 0;j<tableLength;j++){
+                cellStack.addToStack(Table.getInstance().getCell(i,j));
+                if (cellStack.isSameColorStack()){
+                    System.out.println("Same color in row");
+                    sameColorStack(cellStack.getStack());
+                }
+                cellStack.clearStack();
+            }
+        }
+        for (int j = 0;j < tableLength;j++){
+            CellStack cellStack = new CellStack();
+            for (int i = 0;i<tableWith;i++){
+                cellStack.addToStack(Table.getInstance().getCell(i,j));
+                if (cellStack.isSameColorStack()){
+                    System.out.println("Same color in collemn");
+                    sameColorStack(cellStack.getStack());
+                }
+                cellStack.clearStack();
+            }
+        }
+    }
+
+
+    private void sameColorStack(ArrayList<Cell> cells){
+        //TODO animation clearing cell
+        int virusCount = 0;
+        int score = 0;
+        for (Cell cell : cells) {
+            if ((cell.getCellObjectType() == CellObjectType.NORMAL_CAPSULE_TAIL || cell.getCellObjectType() == CellObjectType.NORMAL_CAPSULE_HEAD) ||
+                    cell.getCellObjectType() == CellObjectType.ENHANCEMENT_CAPSULE_TAIL || cell.getCellObjectType() == CellObjectType.ENHANCEMENT_CAPSULE_HEAD) {
+                Capsule capsule = (Capsule) cell.getCellObject();
+                if (cell.equals(capsule.getHead())){
+                    HalfCapsule halfCapsule = new HalfCapsule(capsule,1);
+                } else {
+                    HalfCapsule halfCapsule = new HalfCapsule(capsule,0);
+                }
+                score+=2;
+            } else if (cell.getCellObjectType() == CellObjectType.VIRUS){
+                virusCount++;
+                score+=4;
+            } else if (cell.getCellObjectType() == CellObjectType.HALF_CAPSULE) {
+                score+=2;
+            }
+            cell.clearCell();
+            Game.getInstance().getGameSet().addScore(score);
+            Game.getInstance().getGameSet().removeViruses(virusCount);
+        }
     }
 }

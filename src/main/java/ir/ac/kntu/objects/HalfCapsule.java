@@ -12,10 +12,10 @@ public class HalfCapsule implements CellObject{
 
     public HalfCapsule(Capsule capsule,int i){
         if (i == 0) {
-            syncWithCell(capsule.getHead());
+            syncWithCell(capsule.getHead(),null);
             color = capsule.getHeadColor();
         } else {
-            syncWithCell(capsule.getTail());
+            syncWithCell(capsule.getTail(),null);
             color = capsule.getTailColor();
         }
     }
@@ -37,10 +37,11 @@ public class HalfCapsule implements CellObject{
     }
 
     @Override
-    public void syncWithCell(Cell cell) {
-        this.cell = cell;
-        cell.setCellObject(this);
-        cell.setCellObjectType(CellObjectType.HALF_CAPSULE);
+    public void syncWithCell(Cell head,Cell tail) {
+        this.cell = head;
+        head.setCellObject(this);
+        head.setColor(color);
+        head.setCellObjectType(CellObjectType.HALF_CAPSULE);
     }
 
     @Override

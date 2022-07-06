@@ -3,6 +3,7 @@ package ir.ac.kntu.objects.capsule;
 import ir.ac.kntu.logic.Color;
 import ir.ac.kntu.objects.Cell;
 import ir.ac.kntu.objects.CellObject;
+import ir.ac.kntu.objects.CellObjectType;
 import ir.ac.kntu.objects.Table;
 
 import java.util.Objects;
@@ -23,12 +24,13 @@ public abstract class Capsule implements CellObject {
 
     private boolean staticCapsule = false;
 
-    Color headColor;
+    private Color headColor;
 
-    Color tailColor;
+    private Color tailColor;
+
+    private int degree = 180;
 
     public Capsule(){
-        capsuleStanding = CapsuleStanding.HORIZONTAL;
         id = ID;
         ID++;
     }
@@ -81,26 +83,20 @@ public abstract class Capsule implements CellObject {
         return capsuleStanding;
     }
 
-    public void setCapsuleStanding(CapsuleStanding capsuleStanding) {
-        this.capsuleStanding = capsuleStanding;
-        syncWithCell(head);
-    }
-
-    public Cell getImageTail(Cell imageHead){
-        Cell result = null;
-        switch (getCapsuleStanding()){
-            case VERTICAL : {
-                result = Table.getInstance().getCell(imageHead.getPosX(),imageHead.getPosY()+1);
-            }
-            case HORIZONTAL : {
-                result = Table.getInstance().getCell(imageHead.getPosX()+1,imageHead.getPosY());
-            }
-        }
-        return result;
-    }
-
     public void setStaticCapsule(boolean staticCapsule) {
         this.staticCapsule = staticCapsule;
+    }
+
+    public void setCapsuleStanding(CapsuleStanding capsuleStanding) {
+        this.capsuleStanding = capsuleStanding;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
     }
 
     public boolean isStaticCapsule() {

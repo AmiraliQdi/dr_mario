@@ -3,6 +3,7 @@ package ir.ac.kntu.logic;
 import ir.ac.kntu.graphic.GraphicEngine;
 import ir.ac.kntu.objects.Table;
 import ir.ac.kntu.resources.User;
+import javafx.scene.Group;
 
 public class Game {
 
@@ -14,9 +15,9 @@ public class Game {
 
     private Thread gameSetThread;
 
-    private Thread playerOneThread;
-
     private Thread playerTwo;
+
+    private Player playerOne;
 
     private GameSet gameSet;
 
@@ -29,27 +30,32 @@ public class Game {
         tableThread = new Thread(Table.getInstance(),"TableThread");
     }
 
-    public void pauseGame() throws InterruptedException {
-        tableThread.wait();
-        gameSetThread.wait();
-        playerOneThread.wait();
+    public void pauseGame() {
+        try {
+            tableThread.wait();
+            gameSetThread.wait();
+        } catch (InterruptedException e){
+            System.out.println(e);
+        }
     }
 
     public void resumeGame(){
         tableThread.notify();
         gameSetThread.notify();
-        playerOneThread.notify();
     }
 
     public void closeThreads(){
-        graphicEngineThread.stop();
-        tableThread.stop();
-        playerOneThread.stop();
-        gameSetThread.stop();
+        try {
+            graphicEngineThread.stop();
+            tableThread.stop();
+            gameSetThread.stop();
+        } catch (NullPointerException e){
+
+        }
     }
 
     public void makePlayerOne(){
-        playerOneThread = new Thread(new Player());
+        playerOne = Player.getInstance();
     }
 
     public static Game getInstance() {
@@ -66,10 +72,6 @@ public class Game {
 
     public User getLoggedUser() {
         return loggedUser;
-    }
-
-    public void startPlayerOneThread(){
-        playerOneThread.start();
     }
 
     public void makeGameSet(){

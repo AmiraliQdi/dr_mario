@@ -47,10 +47,11 @@ public class Virus implements CellObject{
     }
 
     @Override
-    public void syncWithCell(Cell cell) {
-        this.cell = cell;
-        cell.setCellObject(this);
-        cell.setCellObjectType(CellObjectType.VIRUS);
+    public void syncWithCell(Cell head,Cell tail) {
+        this.cell = head;
+        head.setCellObject(this);
+        head.setColor(color);
+        head.setCellObjectType(CellObjectType.VIRUS);
     }
 
     @Override

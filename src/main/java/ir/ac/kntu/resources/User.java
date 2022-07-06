@@ -43,7 +43,7 @@ public class User implements Serializable {
         return users;
     }
 
-    public static void saveUsers(ArrayList<User> users) throws IOException {
+    public static void saveUsers() throws IOException {
         File file = new File("Users.info");
         try(FileOutputStream fileOutputStream = new FileOutputStream(file);
                 ObjectOutputStream output = new ObjectOutputStream(fileOutputStream)) {
@@ -68,7 +68,7 @@ public class User implements Serializable {
         }
         User newUser = new User(userName);
         users.add(newUser);
-        saveUsers(users);
+        saveUsers();
         return newUser;
     }
 
